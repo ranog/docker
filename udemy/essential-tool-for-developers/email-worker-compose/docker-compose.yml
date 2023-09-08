@@ -1,6 +1,9 @@
 version: '3.7'
 volumes:
   db_data:
+networks:
+  bank:
+  web:
 services:
   db:
     image: postgres:11.5
@@ -10,12 +13,8 @@ services:
       # Scripts
       - ./scripts:/scripts
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    ports:
-      - 5432:5432
+    networks:
+      - bank
   frontend:
     image: nginx:1.17.4
     volumes:
@@ -25,6 +24,10 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - 80:80
+    networks:
+      - web
+    depends_on:
+      - app
   app:
     image: python:3.7.4
     volumes:
@@ -32,3 +35,8 @@ services:
       - ./app:/app
     working_dir: /app
     command: bash ./app.sh
+    networks:
+      - bank
+      - web
+    depends_on:
+      - db
