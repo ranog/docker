@@ -5,7 +5,9 @@ services:
   db:
     image: postgres:11.5
     volumes:
+      # Data volume
       - db_data:/var/lib/postgresql/data
+      # Scripts
       - ./scripts:/scripts
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
@@ -17,14 +19,16 @@ services:
   frontend:
     image: nginx:1.17.4
     volumes:
+      # Site
       - ./web:/usr/share/nginx/html
+      # Reverse proxy configuration
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - 80:80
   app:
     image: python:3.7.4
     volumes:
+    # App
       - ./app:/app
     working_dir: /app
     command: bash ./app.sh
-    ports:
-      - 8080:8080
