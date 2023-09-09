@@ -48,12 +48,12 @@ services:
     networks:
       - row
   worker:
-    image: python:3.7.4
+    build: worker
     volumes:
       # Worker
       - ./worker:/worker
     working_dir: /worker
-    command: bash ./app.sh
+    command: worker.py
     networks:
       - row
     depends_on:
