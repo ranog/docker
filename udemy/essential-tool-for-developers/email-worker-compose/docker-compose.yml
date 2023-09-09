@@ -4,6 +4,7 @@ volumes:
 networks:
   bank:
   web:
+  row:
 services:
   db:
     image: postgres:11.5
@@ -38,5 +39,22 @@ services:
     networks:
       - bank
       - web
+      - row
     depends_on:
       - db
+      - queue
+  queue:
+    image: redis:5.0.5
+    networks:
+      - row
+  worker:
+    image: python:3.7.4
+    volumes:
+      # Worker
+      - ./worker:/worker
+    working_dir: /worker
+    command: bash ./app.sh
+    networks:
+      - row
+    depends_on:
+      - queue
